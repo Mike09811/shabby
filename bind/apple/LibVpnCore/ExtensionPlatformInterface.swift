@@ -1,12 +1,12 @@
 import Foundation
-import Libclash
+// import Libclash
 import NetworkExtension
 import UserNotifications
 #if canImport(CoreWLAN)
     import CoreWLAN
 #endif
 
-public class ExtensionPlatformInterface: NSObject, LibclashPlatformInterfaceProtocol{
+public class ExtensionPlatformInterface: NSObject { //, LibclashPlatformInterfaceProtocol{
     private let tunnel: ExtensionProvider
     private var networkSettings: NEPacketTunnelNetworkSettings?
 
@@ -14,6 +14,7 @@ public class ExtensionPlatformInterface: NSObject, LibclashPlatformInterfaceProt
         self.tunnel = tunnel
     }
 
+    /*
     public func openTun(_ options: LibclashTunOptionsProtocol?, ret0_: UnsafeMutablePointer<Int32>?) throws {
         try runBlocking { [self] in
             try await openTun0(options, ret0_)
@@ -202,6 +203,7 @@ public class ExtensionPlatformInterface: NSObject, LibclashPlatformInterfaceProt
         }
         ret0_.pointee = tun_fd
     }
+    */
     
     public func protectFd(_ fd: Int32) {
         

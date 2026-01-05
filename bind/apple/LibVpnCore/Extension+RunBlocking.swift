@@ -1,5 +1,5 @@
 import Foundation
-import Libclash
+// import Libclash
 import NetworkExtension
 
 func runBlocking<T>(_ block: @escaping () async -> T) -> T {

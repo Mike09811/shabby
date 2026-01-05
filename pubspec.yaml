@@ -99,7 +99,7 @@ dependencies:
       ref: bf21977eaa4e6035b1d81e249f91525a74f86ffd
       path: packages/window_manager
   libclash_vpn_service:
-    path: ../libclash-vpn-service/
+    path: ./packages/libclash-vpn-service/
     #git:
       #url: https://github.com/KaringX/libclash-vpn-service.git
       #ref: master

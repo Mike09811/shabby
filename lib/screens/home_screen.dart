@@ -253,40 +253,10 @@ class _HomeScreenState extends LasyRenderingState<HomeScreen>
       body: SafeArea(
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-                    Text(
-                      AppUtils.getName(),
-                      style: const TextStyle(
-                          fontWeight: ThemeConfig.kFontWeightTitle,
-                          fontSize: ThemeConfig.kFontSizeTitle),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                  ]),
-                ],
-              ),
-            ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 15, 20, 0),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      HomeScreenWidgetPart1(),
-                      SizedBox(
-                        height: 15,
-                      ),
-                      HomeScreenWidgetPart2(),
-                    ],
-                  ),
-                ),
+                padding: const EdgeInsets.all(20),
+                child: HomeScreenWidgetPart1(),
               ),
             ),
           ],

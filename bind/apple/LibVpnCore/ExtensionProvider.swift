@@ -1,6 +1,6 @@
 import Foundation
 import System
-import Libclash
+// import Libclash
 
 import NetworkExtension
 
@@ -89,11 +89,13 @@ open class ExtensionProvider: NEPacketTunnelProvider {
             if message.messageId == "restart" {
                 try await restartService(extra: &messageResponse.extra)
             } else if message.messageId == "clashiApiConnections"{
-                let content = LibclashGetConnections(message.messageParams == "true")
+                // let content = LibclashGetConnections(message.messageParams == "true")
+                let content = "{}"
                 let data: Data = content.data(using: String.Encoding.utf8)!
                 return data
             } else if message.messageId == "clashiApiTraffic"{
-                let content = LibclashGetTraffic()
+                // let content = LibclashGetTraffic()
+                let content = "{}"
                 let data: Data = content.data(using: String.Encoding.utf8)!
                 return data
             } else {
@@ -152,15 +154,15 @@ extension ExtensionProvider {
         if config == nil {
             throw VpnError.Error("decode VpnServiceConfig failed: \(configFilePath)")
         }
-        let setupOptions = LibclashSetupOptions()
-        setupOptions.homeDir = config!.base_dir
-        setupOptions.logFile = config!.log_path
+        // let setupOptions = LibclashSetupOptions()
+        // setupOptions.homeDir = config!.base_dir
+        // setupOptions.logFile = config!.log_path
 
-        var error: NSError?
-        LibclashSetup(setupOptions, &error)
-        if error != nil {
-            throw VpnError.Error("LibclashSetup failed: \(error!.localizedDescription)")
-        }
+        // var error: NSError?
+        // LibclashSetup(setupOptions, &error)
+        // if error != nil {
+        //     throw VpnError.Error("LibclashSetup failed: \(error!.localizedDescription)")
+        // }
     }
 
     fileprivate func writeError(_ message: String) {
@@ -180,22 +182,22 @@ extension ExtensionProvider {
     }
 
     fileprivate func startService() async throws {
-        let startOptions = LibclashStartOptions()
-        startOptions.configFile = config!.core_path
-        startOptions.configFilePatch = config!.core_path_patch
-        startOptions.configFilePatchFinal = config!.core_path_patch_final
+        // let startOptions = LibclashStartOptions()
+        // startOptions.configFile = config!.core_path
+        // startOptions.configFilePatch = config!.core_path_patch
+        // startOptions.configFilePatchFinal = config!.core_path_patch_final
 
-        let tunInterface = ExtensionPlatformInterface(self)
-        var error: NSError?
-        LibclashStart(startOptions, tunInterface, &error)
-        if error != nil {
-            throw VpnError.Error("LibclashStart failed: \(error!.localizedDescription)")
-        }
+        // let tunInterface = ExtensionPlatformInterface(self)
+        // var error: NSError?
+        // LibclashStart(startOptions, tunInterface, &error)
+        // if error != nil {
+        //     throw VpnError.Error("LibclashStart failed: \(error!.localizedDescription)")
+        // }
     }
 
     fileprivate func stopService() async throws {
-        var error: NSError?
-        LibclashStop(&error)
+        // var error: NSError?
+        // LibclashStop(&error)
     }
 
     func restartService(extra: inout [String: String]) async throws {

@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:clashmi/app/clash/clash_config.dart';
 import 'package:clashmi/app/clash/clash_http_api.dart';
 import 'package:clashmi/app/local_services/vpn_service.dart';
+import 'package:clashmi/app/modules/setting_manager.dart';
 import 'package:clashmi/app/runtime/return_result.dart';
 import 'package:clashmi/app/utils/app_utils.dart';
 import 'package:clashmi/app/utils/log.dart';
@@ -31,16 +32,10 @@ class ClashSettingManager {
 
   static Future<void> initGeo() async {
     final homePath = await PathUtils.profileDir();
-    const fileNameList = [
-      "geosite.zip",
-      "geoip.zip",
-      "ASN.mmdb",
-    ];
+    const fileNameList = ["geosite.zip", "geoip.zip", "ASN.mmdb"];
     try {
       for (final fileName in fileNameList) {
-        final filePath = File(
-          path.join(homePath, fileName),
-        );
+        final filePath = File(path.join(homePath, fileName));
         final isExists = await filePath.exists();
         if (isExists) {
           final stat = await filePath.stat();
@@ -146,17 +141,18 @@ class ClashSettingManager {
       "f000::/5",
       "f800::/6",
       "fe00::/9",
-      "fec0::/10"
+      "fec0::/10",
     ];
     return RawTun.by(
-        OverWrite: true,
-        Enable: !Platform.isWindows,
-        Stack: ClashTunStack.gvisor.name,
-        MTU: 4064,
-        Inet4Address: ["$_gateWay.1/30"],
-        Inet6Address: ["$_gateWay6/126"],
-        //RouteAddress: routeAddress,
-        DNSHijack: [dnsHijack]);
+      OverWrite: true,
+      Enable: !Platform.isWindows,
+      Stack: ClashTunStack.gvisor.name,
+      MTU: 4064,
+      Inet4Address: ["$_gateWay.1/30"],
+      Inet6Address: ["$_gateWay6/126"],
+      //RouteAddress: routeAddress,
+      DNSHijack: [dnsHijack],
+    );
   }
 
   static RawDNS defaultDNS() {
@@ -283,10 +279,11 @@ class ClashSettingManager {
 
   static RawTLS defaultTLS() {
     return RawTLS.by(
-        OverWrite: false,
-        Certificate: null,
-        PrivateKey: null,
-        CustomTrustCert: null);
+      OverWrite: false,
+      Certificate: null,
+      PrivateKey: null,
+      CustomTrustCert: null,
+    );
   }
 
   static RawExtensionGeoRuleset defaultRawExtensionRuleset() {
@@ -318,7 +315,9 @@ class ClashSettingManager {
       Ruleset: defaultRawExtensionRuleset(),
       Tun: RawExtensionTun.by(
         httpProxy: RawExtensionTunHttpProxy.by(
-            Enable: false, BypassDomain: bypassDomainLocal + bypassDomainCN),
+          Enable: false,
+          BypassDomain: bypassDomainLocal + bypassDomainCN,
+        ),
         perApp: RawExtensionTunPerApp.by(Enable: false),
       ),
       PprofAddr: null,
@@ -456,8 +455,9 @@ class ClashSettingManager {
     _setting.TLS ??= defaultTLS();
     _setting.Extension ??= defaultExtension();
     if (_setting.Extension?.Tun.perApp.PackageIds != null) {
-      _setting.Extension?.Tun.perApp.PackageIds!
-          .removeWhere((element) => element == AppUtils.getId());
+      _setting.Extension?.Tun.perApp.PackageIds!.removeWhere(
+        (element) => element == AppUtils.getId(),
+      );
     }
 
     if (_setting.Extension?.Ruleset.AsnUrl ==
@@ -488,7 +488,8 @@ class ClashSettingManager {
   }
 
   static Future<ReturnResultError?> setConfigsMode(
-      ClashConfigsMode mode) async {
+    ClashConfigsMode mode,
+  ) async {
     _setting.Mode = mode.name;
     await save();
 

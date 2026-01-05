@@ -18,8 +18,8 @@ import 'package:clashmi/app/utils/platform_utils.dart';
 import 'package:clashmi/app/utils/system_scheme_utils.dart';
 import 'package:clashmi/app/utils/windows_version_helper.dart';
 import 'package:clashmi/i18n/strings.g.dart';
-import 'package:clashmi/screens/home_screen.dart';
 import 'package:clashmi/screens/launch_failed_screen.dart';
+import 'package:clashmi/screens/main_screen.dart';
 import 'package:clashmi/screens/theme_data_dark.dart';
 import 'package:clashmi/screens/themes.dart';
 import 'package:clashmi/screens/widgets/routes.dart';
@@ -64,7 +64,8 @@ Future<void> run(List<String> args) async {
       String buildVersion = AppUtils.getBuildinVersion();
       String exePath = Platform.resolvedExecutable;
       Log.w(
-          'launch $buildVersion $exePath, $args, ${Directory.current.absolute.path}, $profileDir');
+        'launch $buildVersion $exePath, $args, ${Directory.current.absolute.path}, $profileDir',
+      );
       String cache = await PathUtils.cacheDir();
       if (cache.isEmpty) {
         startFailedReason = StartFailedReason.invalidProfile;
@@ -84,8 +85,8 @@ Future<void> run(List<String> args) async {
       }
       const inProduction = bool.fromEnvironment("dart.vm.product");
       if (inProduction) {
-        if (Platform.isMacOS){
-          if(!path.isWithin("/Applications", exePath)){
+        if (Platform.isMacOS) {
+          if (!path.isWithin("/Applications", exePath)) {
             startFailedReason = StartFailedReason.invalidInstallPath;
             break;
           }
@@ -141,12 +142,15 @@ Future<void> run(List<String> args) async {
 
     if (Platform.isWindows) {
       await WindowsSingleInstance.ensureSingleInstance(
-          args, "clashmi_single_identifier", onSecondWindow: (args) async {
-        if (await windowManager.isMinimized()) {
-          await windowManager.restore();
-        }
-        await windowManager.focus();
-      });
+        args,
+        "clashmi_single_identifier",
+        onSecondWindow: (args) async {
+          if (await windowManager.isMinimized()) {
+            await windowManager.restore();
+          }
+          await windowManager.focus();
+        },
+      );
     }
 
     await SettingManager.init();
@@ -157,7 +161,7 @@ Future<void> run(List<String> args) async {
           DeviceOrientation.portraitUp,
           DeviceOrientation.landscapeLeft,
           DeviceOrientation.portraitDown,
-          DeviceOrientation.landscapeRight
+          DeviceOrientation.landscapeRight,
         ]);
       } else {
         SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -171,14 +175,13 @@ Future<void> run(List<String> args) async {
   }
   if (Platform.isAndroid) {
     SystemUiOverlayStyle systemUiOverlayStyle = const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        systemNavigationBarColor: Colors.transparent);
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
+    );
     SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   }
-  runApp(TranslationProvider(
-    child: const MyApp(),
-  ));
+  runApp(TranslationProvider(child: const MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -262,62 +265,64 @@ class MyAppState extends State<MyApp>
 
   @override
   Widget build(BuildContext context) {
-    String schemeArg = processArgs.firstWhere(
-      (element) {
-        return element
-            .trim()
-            .startsWith(SystemSchemeUtils.getClashSchemeWith());
-      },
-      orElse: () => '',
-    );
+    String schemeArg = processArgs.firstWhere((element) {
+      return element.trim().startsWith(SystemSchemeUtils.getClashSchemeWith());
+    }, orElse: () => '');
 
     List<NavigatorObserver> observers = [];
 
     observers.add(AppRouteObserver.instance);
 
     return MultiProvider(
-        providers: [ChangeNotifierProvider.value(value: Themes())],
-        child: Consumer<Themes>(builder: (context, appTheme, _) {
-          Provider.of<Themes>(context)
-              .setTheme(SettingManager.getConfig().ui.theme, false);
+      providers: [ChangeNotifierProvider.value(value: Themes())],
+      child: Consumer<Themes>(
+        builder: (context, appTheme, _) {
+          Provider.of<Themes>(
+            context,
+          ).setTheme(SettingManager.getConfig().ui.theme, false);
           return Shortcuts(
-              shortcuts: const {
-                SingleActivator(LogicalKeyboardKey.select): ActivateIntent()
-              },
-              child: MaterialApp(
-                showSemanticsDebugger: false,
-                debugShowCheckedModeBanner: false,
-                locale: TranslationProvider.of(context).flutterLocale,
-                supportedLocales: AppLocaleUtils.supportedLocales,
-                localizationsDelegates: GlobalMaterialLocalizations.delegates,
-                navigatorObservers: observers,
-                home: PopScope(
-                    canPop: false,
-                    onPopInvokedWithResult: (didPop, result) {
-                      if (Platform.isAndroid || Platform.isIOS) {
-                        MoveToBackground.moveTaskToBack();
-                      }
-                    },
-                    child: startFailedReason != null
-                        ? LaunchFailedScreen(
-                            startFailedReason: startFailedReason!,
-                            startFailedReasonDesc: startFailedReasonDesc,
-                          )
-                        : HomeScreen(launchUrl: schemeArg.trim())),
-                builder: SettingManager.getConfig().ui.disableFontScaler
-                    ? (context, widget) {
-                        return MediaQuery(
-                          data: MediaQuery.of(context)
-                              .copyWith(textScaler: TextScaler.noScaling),
-                          child: widget!,
-                        );
-                      }
-                    : null,
-                themeMode: appTheme.themeMode(),
-                theme: appTheme.themeData(context),
-                darkTheme: ThemeDataDark.theme(context),
-              ));
-        }));
+            shortcuts: const {
+              SingleActivator(LogicalKeyboardKey.select): ActivateIntent(),
+            },
+            child: MaterialApp(
+              showSemanticsDebugger: false,
+              debugShowCheckedModeBanner: false,
+              locale: TranslationProvider.of(context).flutterLocale,
+              supportedLocales: AppLocaleUtils.supportedLocales,
+              localizationsDelegates: GlobalMaterialLocalizations.delegates,
+              navigatorObservers: observers,
+              home: PopScope(
+                canPop: false,
+                onPopInvokedWithResult: (didPop, result) {
+                  if (Platform.isAndroid || Platform.isIOS) {
+                    MoveToBackground.moveTaskToBack();
+                  }
+                },
+                child: startFailedReason != null
+                    ? LaunchFailedScreen(
+                        startFailedReason: startFailedReason!,
+                        startFailedReasonDesc: startFailedReasonDesc,
+                      )
+                    : MainScreen(launchUrl: schemeArg.trim()),
+              ),
+              builder: SettingManager.getConfig().ui.disableFontScaler
+                  ? (context, widget) {
+                      return MediaQuery(
+                        data: MediaQuery.of(
+                          context,
+                        ).copyWith(textScaler: TextScaler.noScaling),
+                        child: widget!,
+                      );
+                    }
+                  : null,
+              themeMode: appTheme.themeMode(),
+              theme: appTheme.themeData(context),
+              darkTheme: ThemeDataDark.theme(context),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -466,14 +471,8 @@ class MyAppState extends State<MyApp>
       return;
     }
     List<MenuItem> items = [
-      MenuItem(
-        key: kMenuOpen,
-        label: t.main.tray.menuOpen,
-      ),
-      MenuItem(
-        key: kMenuExit,
-        label: t.main.tray.menuExit,
-      )
+      MenuItem(key: kMenuOpen, label: t.main.tray.menuOpen),
+      MenuItem(key: kMenuExit, label: t.main.tray.menuExit),
     ];
 
     await trayManager.setContextMenu(Menu(items: items));

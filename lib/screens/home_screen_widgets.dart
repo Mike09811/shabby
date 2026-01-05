@@ -151,347 +151,194 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
     final tcontext = Translations.of(context);
     bool connected = _state == FlutterVpnServiceState.connected;
     final currentProfile = ProfileManager.getCurrent();
-    final currentProfileName = currentProfile?.getShowName() ?? "";
-    final settings = SettingManager.getConfig();
-    String tranffic = "";
-    Tuple2<bool, String>? tranfficExpire;
-    if (currentProfile != null && currentProfile.isRemote()) {
-      if (currentProfile.upload != 0 ||
-          currentProfile.download != 0 ||
-          currentProfile.total != 0) {
-        String upload =
-            ClashHttpApi.convertTrafficToStringDouble(currentProfile.upload);
-        String download =
-            ClashHttpApi.convertTrafficToStringDouble(currentProfile.download);
-        String total =
-            ClashHttpApi.convertTrafficToStringDouble(currentProfile.total);
-        tranffic = "↑ $upload ↓ $download/$total";
-      }
-      if (currentProfile.expire.isNotEmpty) {
-        tranfficExpire = currentProfile.getExpireTime(settings.languageTag);
-      }
-    }
-    var widgets = [
-      Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(children: [
-                Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: connected ? Colors.green : Colors.grey,
-                      shape: BoxShape.circle,
-                    )),
-                SizedBox(
-                  width: 10,
-                ),
+    final currentProfileName = currentProfile?.getShowName() ?? "未选择节点";
+
+    return Column(
+      children: [
+        // Top Bar
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Logo
+            Row(
+              children: [
+                Icon(Icons.flash_on, color: Colors.blue, size: 28),
+                SizedBox(width: 8),
                 Text(
-                  connected
-                      ? tcontext.meta.connected
-                      : tcontext.meta.disconnected,
-                  textAlign: TextAlign.left,
+                  "ClashMi",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-              ]),
-              Stack(children: [
-                SizedBox(
-                  width: 60,
-                  child: FittedBox(
-                    fit: BoxFit.fill,
-                    child: Switch.adaptive(
-                      value: _state == FlutterVpnServiceState.connected,
-                      focusNode: _focusNodeConnect,
-                      onChanged: (bool value) async {
-                        if (value) {
-                          await start("switch");
-                        } else {
-                          await stop();
-                        }
-                      },
-                    ),
-                  ),
-                ),
-                Positioned(
-                    left: 8,
-                    top: 12,
-                    child: SizedBox(
-                        width: 25,
-                        height: 25,
-                        child: _state == FlutterVpnServiceState.connecting ||
-                                _state ==
-                                    FlutterVpnServiceState.disconnecting ||
-                                _state == FlutterVpnServiceState.reasserting
-                            ? const RepaintBoundary(
-                                child: CircularProgressIndicator(
-                                    color: ThemeDefine.kColorGreenBright))
-                            : null)),
-              ]),
-            ],
-          ),
-          /*connected
-              ? Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                  ValueListenableBuilder<String>(
-                    builder: _buildWithTrafficSpeedValue,
-                    valueListenable: _memory,
-                  ),
-                ])
-              : const SizedBox.shrink(),*/
-          connected
-              ? Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                  ValueListenableBuilder<String>(
-                    builder: _buildWithTrafficSpeedValue,
-                    valueListenable: _trafficTotal,
-                  ),
-                ])
-              : const SizedBox.shrink(),
-          connected
-              ? Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                  ValueListenableBuilder<String>(
-                    builder: _buildWithTrafficSpeedValue,
-                    valueListenable: _trafficSpeed,
-                  ),
-                ])
-              : const SizedBox.shrink(),
-          SizedBox(
-            height: connected ? 10 : 0,
-          ),
-        ],
-      ),
-      Container(
-        padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
-        height: 70,
-        child: SegmentedElevatedButton(
-          segments: [
-            SegemntedElevatedButtonItem(
-                value: ClashConfigsMode.rule.index, text: tcontext.meta.rule),
-            SegemntedElevatedButtonItem(
-                value: ClashConfigsMode.global.index,
-                text: tcontext.meta.global),
-            SegemntedElevatedButtonItem(
-                value: ClashConfigsMode.direct.index,
-                text: tcontext.meta.direct)
-          ],
-          selected: ClashSettingManager.getConfigsMode().index,
-          padding: const EdgeInsets.fromLTRB(0, 3, 0, 3),
-          onPressed: (int value) async {
-            ClashConfigsMode type = ClashConfigsMode.values[value];
-            var error = await ClashSettingManager.setConfigsMode(type);
-            if (!context.mounted) {
-              return;
-            }
-            if (error != null) {
-              DialogUtils.showAlertDialog(context, error.message);
-              return;
-            }
-            _updateProxyNow();
-          },
-        ),
-      ),
-      ListTile(
-        title: Text(tcontext.meta.myProfiles),
-        subtitle: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              currentProfile != null
-                  ? Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: Text(currentProfileName,
-                          style: TextStyle(
-                            color: ThemeDefine.kColorBlue,
-                          )))
-                  : SizedBox.shrink(),
-              tranffic.isNotEmpty
-                  ? Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: Text(tranffic,
-                          style: TextStyle(
-                            color: ThemeDefine.kColorBlue,
-                          )))
-                  : SizedBox.shrink(),
-              tranfficExpire != null
-                  ? Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: Text(
-                        tranfficExpire.item2,
-                        style: TextStyle(
-                            color: tranfficExpire.item1
-                                ? Colors.red
-                                : ThemeDefine.kColorBlue,
-                            fontSize: 12),
-                      ))
-                  : SizedBox.shrink(),
-            ]),
-        trailing: SizedBox(
-            width: 70,
-            child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-              SizedBox(
-                width: 45,
-                height: 45,
-                child: InkWell(
-                    onTap: () async {
-                      await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              settings: ProfilesBoardScreen.routSettings(),
-                              builder: (context) => ProfilesBoardScreen(
-                                    navigateToAdd: true,
-                                  )));
-                      setState(() {});
-                    },
-                    child: Icon(
-                      Icons.add,
-                      size: 30,
-                    )),
+              ],
+            ),
+            // Mode Switch
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[800],
+                borderRadius: BorderRadius.circular(20),
               ),
-              SizedBox(width: 5),
-              Icon(
-                Icons.keyboard_arrow_right,
-                size: 20,
-              )
-            ])),
-        minVerticalPadding: 20,
-        onTap: () async {
-          await Navigator.push(
-              context,
-              MaterialPageRoute(
-                  settings: ProfilesBoardScreen.routSettings(),
-                  builder: (context) => ProfilesBoardScreen()));
-          setState(() {});
-        },
-      ),
-    ];
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              child: DropdownButton<ClashConfigsMode>(
+                value: ClashSettingManager.getConfigsMode(),
+                underline: SizedBox(),
+                icon: Icon(Icons.arrow_drop_down, color: Colors.white),
+                dropdownColor: Colors.grey[900],
+                items: [
+                  DropdownMenuItem(
+                    value: ClashConfigsMode.rule,
+                    child: Text(tcontext.meta.rule),
+                  ),
+                  DropdownMenuItem(
+                    value: ClashConfigsMode.global,
+                    child: Text(tcontext.meta.global),
+                  ),
+                ],
+                onChanged: (ClashConfigsMode? newValue) async {
+                  if (newValue != null) {
+                    await ClashSettingManager.setConfigsMode(newValue);
+                    setState(() {});
+                    _updateProxyNow();
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
+        
+        // Customer Service
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            onPressed: () {
+               // Handle customer service tap
+            },
+            icon: Icon(Icons.headset_mic, color: Colors.grey),
+            label: Text("客服", style: TextStyle(color: Colors.grey)),
+          ),
+        ),
 
-    if (connected) {
-      widgets.add(ListTile(
-        title: Text(tcontext.meta.proxy),
-        subtitle: ValueListenableBuilder<String>(
-          builder: _buildWithValue,
-          valueListenable: _proxyNow,
-        ),
-        trailing: Icon(
-          Icons.keyboard_arrow_right,
-          size: 20,
-        ),
-        minVerticalPadding: 20,
-        onTap: () async {
-          await Navigator.push(
-              context,
-              MaterialPageRoute(
-                  settings: ProxyBoardScreen.routSettings(),
-                  builder: (context) => ProxyBoardScreen()));
-          _updateProxyNow();
-        },
-      ));
-      widgets.add(ListTile(
-        title: Text(tcontext.meta.board),
-        trailing: Icon(
-          Icons.keyboard_arrow_right,
-          size: 20,
-        ),
-        minVerticalPadding: 20,
-        onTap: () async {
-          var setting = SettingManager.getConfig();
-          if (setting.boardOnline && setting.boardUrl.isNotEmpty) {
-            final uri = Uri.tryParse(setting.boardUrl);
-            if (uri == null) {
-              final msg = "${tcontext.meta.urlInvalid}:${setting.boardUrl}";
-              DialogUtils.showAlertDialog(context, msg);
-              return;
-            }
-            final shortUrl = Uri(
-              scheme: uri.scheme,
-              userInfo: uri.userInfo,
-              host: uri.host,
-              port: uri.port,
-            );
-            String host =
-                Platform.isIOS ? await _getLocalAddress() : "127.0.0.1";
-            String secret = await ClashHttpApi.getSecret();
-            final url =
-                '${shortUrl.toString()}/?hostname=$host&port=${ClashSettingManager.getControlPort()}&secret=$secret&http=true';
-            if (!context.mounted) {
-              return;
-            }
-            await WebviewHelper.loadUrl(context, url, "onlineboard",
-                title: tcontext.meta.board, inappWebViewOpenExternal: false);
-            return;
-          }
-          ReturnResult result = await Zashboard.start();
-          if (result.error != null) {
-            if (!context.mounted) {
-              return;
-            }
-            DialogUtils.showAlertDialog(context, result.error!.message);
-            return;
-          }
-          String url = result.data!;
-          if (!context.mounted) {
-            return;
-          }
-          await WebviewHelper.loadUrl(context, url, "board",
-              title: tcontext.meta.board, inappWebViewOpenExternal: false);
-          if (PlatformUtils.isMobile()) {
-            await Zashboard.stop();
-          }
-          _updateProxyNow();
-        },
-      ));
+        Spacer(),
 
-      widgets.add(ListTile(
-        title: Text(tcontext.meta.runtimeProfile),
-        trailing: Icon(
-          Icons.keyboard_arrow_right,
-          size: 20,
-        ),
-        minVerticalPadding: 20,
-        onTap: () async {
-          late String content;
-          try {
-            final path = await PathUtils.serviceCoreRuntimeProfileFilePath();
-            content = await File(path).readAsString();
-          } catch (err) {
-            if (!context.mounted) {
-              return;
+        // Connect Button
+        GestureDetector(
+          onTap: () async {
+            if (connected) {
+              await stop();
+            } else {
+              await start("home");
             }
-            DialogUtils.showAlertDialog(context, err.toString(),
-                showCopy: true, showFAQ: true, withVersion: true);
-            return;
-          }
-          if (!context.mounted) {
-            return;
-          }
-          await Navigator.push(
-              context,
-              MaterialPageRoute(
-                  settings: FileViewScreen.routSettings(),
-                  builder: (context) => FileViewScreen(
-                        title: tcontext.meta.runtimeProfile,
-                        content: content,
-                      )));
-        },
-      ));
-    }
-    return Card(
-        child: Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-      child: ListView.separated(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        itemBuilder: (_, index) {
-          return widgets[index];
-        },
-        separatorBuilder: (BuildContext context, int index) {
-          return const Divider(
-            height: 1,
-            thickness: 0.3,
-          );
-        },
-        itemCount: widgets.length,
-      ),
-    ));
+          },
+          child: Container(
+            width: 180,
+            height: 180,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: connected ? Colors.blue.withOpacity(0.2) : Colors.grey.withOpacity(0.1),
+              border: Border.all(
+                color: connected ? Colors.blue : Colors.grey,
+                width: 2,
+              ),
+              boxShadow: connected
+                  ? [
+                      BoxShadow(
+                        color: Colors.blue.withOpacity(0.5),
+                        blurRadius: 20,
+                        spreadRadius: 5,
+                      )
+                    ]
+                  : [],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.power_settings_new,
+                  size: 60,
+                  color: connected ? Colors.blue : Colors.grey,
+                ),
+                SizedBox(height: 10),
+                Text(
+                  connected ? "已连接" : (_state == FlutterVpnServiceState.connecting ? "连接中..." : "未连接"),
+                  style: TextStyle(
+                    color: connected ? Colors.blue : Colors.grey,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        SizedBox(height: 40),
+
+        // Node Selector
+        InkWell(
+          onTap: () async {
+            await Navigator.push(
+                context,
+                MaterialPageRoute(
+                    settings: ProfilesBoardScreen.routSettings(),
+                    builder: (context) => ProfilesBoardScreen()));
+            setState(() {});
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            decoration: BoxDecoration(
+              color: Colors.grey[900],
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: Colors.grey[800]!),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.public, color: Colors.blue),
+                SizedBox(width: 15),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        currentProfileName,
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (connected)
+                        ValueListenableBuilder<String>(
+                          valueListenable: _proxyNow,
+                          builder: (context, value, child) {
+                            return value.isNotEmpty 
+                                ? Text(value, style: TextStyle(color: Colors.grey, fontSize: 12)) 
+                                : SizedBox.shrink();
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+              ],
+            ),
+          ),
+        ),
+
+        Spacer(),
+
+        // Marketing Banner
+        Container(
+          width: double.infinity,
+          height: 80,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [Colors.blue, Colors.purple]),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Center(
+            child: Text(
+              "限时特惠：年卡 5 折起！",
+              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildWithTrafficSpeedValue(

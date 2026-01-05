@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,7 +14,6 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		A09092BFE381CEB1C2F0E45C /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFCB9FCD5D76BA2D6004A1A4 /* Pods_Runner.framework */; };
-		CE85581F2AF49C5E0024DA42 /* Libclash.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE65C5332AF1F21D005C5724 /* Libclash.xcframework */; };
 		CE8558212AF49F430024DA42 /* LibVpnCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEE0DC2E2AF49B5F00C4E874 /* LibVpnCore.framework */; };
 		CE8558262AF4A0450024DA42 /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = CE65C53B2AF1FF75005C5724 /* libresolv.tbd */; };
 		CED44C8B29F7AE560051B3B6 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEE7505E29EE95B8003FAECA /* NetworkExtension.framework */; };
@@ -114,9 +113,7 @@
 		A6C270C051245E8F21A1FF5B /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 		AFCB9FCD5D76BA2D6004A1A4 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE4B133229ED20B8006E81E6 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
-		CE65C5332AF1F21D005C5724 /* Libclash.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Libclash.xcframework; path = ../bind/apple/Libclash.xcframework; sourceTree = "<group>"; };
 		CE65C53B2AF1FF75005C5724 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
-		CE8558272AF4A2410024DA42 /* Libclash.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Libclash.xcframework; path = ../bind/apple/Libclash.xcframework; sourceTree = "<group>"; };
 		CED44C8A29F7AE560051B3B6 /* clashmiService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = clashmiService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CED44C8D29F7AE560051B3B6 /* PacketTunnelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacketTunnelProvider.swift; sourceTree = "<group>"; };
 		CED44C8F29F7AE560051B3B6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -154,7 +151,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				CE8558262AF4A0450024DA42 /* libresolv.tbd in Frameworks */,
-				CE85581F2AF49C5E0024DA42 /* Libclash.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -165,7 +161,6 @@
 			isa = PBXGroup;
 			children = (
 				CE65C53B2AF1FF75005C5724 /* libresolv.tbd */,
-				CE65C5332AF1F21D005C5724 /* Libclash.xcframework */,
 				AFCB9FCD5D76BA2D6004A1A4 /* Pods_Runner.framework */,
 				CEE7505E29EE95B8003FAECA /* NetworkExtension.framework */,
 			);
@@ -196,7 +191,6 @@
 		97C146E51CF9000F007C117D = {
 			isa = PBXGroup;
 			children = (
-				CE8558272AF4A2410024DA42 /* Libclash.xcframework */,
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
 				CED44C8C29F7AE560051B3B6 /* clashmiService */,
@@ -428,13 +422,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -595,7 +585,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				STRIP_STYLE = debugging;
-				SUPPORTED_PLATFORMS = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -742,7 +732,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				STRIP_STYLE = debugging;
-				SUPPORTED_PLATFORMS = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TARGETED_DEVICE_FAMILY = "1,2";
